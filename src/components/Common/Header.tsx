@@ -1,0 +1,142 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User, LogOut, ChevronDown } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { clearStorage } from '../../utils/storage';
+import { ROUTE } from '../../utils/apis/routes/clientApiRoutes';
+
+interface HeaderProps {
+  title: string;
+  subtitle?: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
+  const navigate = useNavigate();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Mock user data - in a real app, this would come from Redux store or context
+  const user = {
+    name: 'Dr. John Smith',
+    email: 'john.smith@clinic.com',
+    role: 'Physician'
+  };
+
+  const handleLogout = () => {
+    try {
+      // Navigate to login
+      navigate(ROUTE.LOGIN);
+      
+      // Clear all storage
+      clearStorage();
+      
+      // Show success message
+      toast.success('Logged out successfully');
+      
+    } catch (error) {
+      toast.error('Error during logout');
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Left side - Title */}
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+              {title}
+            </h1>
+            {subtitle && (
+              <p className="text-sm text-gray-600 mt-1">
+                {subtitle}
+              </p>
+            )}
+          </div>
+
+          {/* Right side - Profile */}
+          <div className="relative" ref={profileRef}>
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+              {/* Avatar */}
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
+                <User className="w-5 h-5 text-white" />
+              </div>
+              
+              {/* User info */}
+              <div className="hidden sm:block text-left">
+                <p className="text-sm font-medium text-gray-900">
+                  {user.name}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {user.role}
+                </p>
+              </div>
+              
+              {/* Dropdown arrow */}
+              <ChevronDown 
+                className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+                  isProfileOpen ? 'rotate-180' : ''
+                }`} 
+              />
+            </button>
+
+            {/* Profile Dropdown */}
+            {isProfileOpen && (
+              <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                {/* User info section */}
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <User className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {user.email}
+                      </p>
+                      <p className="text-xs text-indigo-600 font-medium">
+                        {user.role}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Logout button */}
+                <div className="px-2 py-1">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors duration-200"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign out</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
