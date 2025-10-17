@@ -6,42 +6,28 @@ import toast from 'react-hot-toast';
 
 // utils
 import prescriptionService from '../../utils/apis/services/prescriptionService';
-import type {
-  Medicine,
-  PrescriptionFormData,
-  PrescriptionFormProps,
-} from '../../utils/interfaces';
-
-/**
- * PrescriptionForm Component
- *
- * A comprehensive form for creating new prescriptions with validation.
- * Features:
- * - Form validation using React Hook Form and Zod
- * - Dynamic medicine loading from API
- * - Real-time error handling and user feedback
- * - Responsive design with modern UI elements
- */
+import type { Medicine, PrescriptionFormProps } from '../../utils/interfaces';
+import { DeliveryTypeOptions } from '../../utils/enums';
+import { medicinesDummyData } from 'src/utils/constants';
+import { PlusIcon, CheckIcon } from '../../utils/SVGIcons';
 
 // Validation schema using Zod for type-safe form validation
 const prescriptionSchema = z.object({
   patientName: z.string().min(2, 'Patient name must be at least 2 characters'),
   dob: z.string().min(1, 'Date of birth is required'),
   address: z.string().min(10, 'Address must be at least 10 characters'),
-  medication: z.string().min(1, 'Please select a medication'),
+  medication: z.string().min(1, 'Select a medication'),
   dosage: z.string().min(1, 'Dosage is required'),
-  deliveryType: z.string().min(1, 'Please select a delivery type'),
+  deliveryType: z.nativeEnum(DeliveryTypeOptions, {
+    message: 'Select a delivery type',
+  }),
 });
 
 // Infer TypeScript type from Zod schema
 type PrescriptionFormData = z.infer<typeof prescriptionSchema>;
 
 // Available delivery type options for the form
-const deliveryTypeOptions = [
-  'Home Delivery',
-  'Pickup from Pharmacy',
-  'Express Delivery',
-];
+const deliveryTypeOptions = Object.values(DeliveryTypeOptions);
 
 const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
   onSubmit,
@@ -69,33 +55,10 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
           setMedicines(response.data.meds);
         }
       } catch (error) {
-        console.error('Failed to load medicines:', error);
         toast.error('Failed to load medicines. Using default list.');
+
         // Fallback to default medicines if API fails
-        setMedicines([
-          {
-            snomedId: '1',
-            displayName: 'Paracetamol 500mg',
-            unlicensed: false,
-            endorsements: {},
-            prescribeByBrandOnly: false,
-            type: 'vmp',
-            bnfExactMatch: null,
-            bnfMatches: null,
-            applianceTypes: [],
-          },
-          {
-            snomedId: '2',
-            displayName: 'Ibuprofen 400mg',
-            unlicensed: false,
-            endorsements: {},
-            prescribeByBrandOnly: false,
-            type: 'vmp',
-            bnfExactMatch: null,
-            bnfMatches: null,
-            applianceTypes: [],
-          },
-        ]);
+        setMedicines(medicinesDummyData);
       } finally {
         setLoadingMedicines(false);
       }
@@ -119,19 +82,7 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
       {/* Header */}
       <div className='bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4'>
         <h2 className='text-xl font-bold text-white flex items-center'>
-          <svg
-            className='w-5 h-5 mr-2'
-            fill='none'
-            stroke='currentColor'
-            viewBox='0 0 24 24'
-          >
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              strokeWidth={2}
-              d='M12 6v6m0 0v6m0-6h6m-6 0H6'
-            />
-          </svg>
+          <PlusIcon className='w-5 h-5 mr-2' />
           Issue New Prescription
         </h2>
         <p className='text-indigo-100 text-sm mt-1'>
@@ -149,7 +100,7 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
                 htmlFor='patientName'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                Patient Name *
+                Patient Name*
               </label>
               <input
                 {...register('patientName')}
@@ -171,7 +122,7 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
                 htmlFor='dob'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                Date of Birth *
+                Date of Birth*
               </label>
               <input
                 {...register('dob')}
@@ -193,7 +144,7 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
               htmlFor='address'
               className='block text-sm font-medium text-gray-700 mb-2'
             >
-              Address *
+              Address*
             </label>
             <textarea
               {...register('address')}
@@ -216,7 +167,7 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
                 htmlFor='medication'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                Medication *
+                Medication*
               </label>
               <select
                 {...register('medication')}
@@ -248,7 +199,7 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
                 htmlFor='dosage'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                Dosage *
+                Dosage*
               </label>
               <input
                 {...register('dosage')}
@@ -270,7 +221,7 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
                 htmlFor='deliveryType'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                Delivery Type *
+                Delivery Type*
               </label>
               <select
                 {...register('deliveryType')}
@@ -325,19 +276,7 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
                 </>
               ) : (
                 <>
-                  <svg
-                    className='w-5 h-5 mr-2'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M5 13l4 4L19 7'
-                    />
-                  </svg>
+                  <CheckIcon className='w-5 h-5 mr-2' />
                   Submit Prescription
                 </>
               )}

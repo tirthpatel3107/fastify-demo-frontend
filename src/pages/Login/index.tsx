@@ -6,7 +6,13 @@ import { z } from 'zod';
 import toast from 'react-hot-toast';
 
 // data
-import usersData from '../../data/users.json';
+import { usersData } from '../../utils/data/users';
+
+// icons
+import { DocumentIcon, LoadingSpinnerIcon } from '../../utils/SVGIcons';
+
+// utils
+import { ROUTE } from 'src/utils/apis/routes/clientApiRoutes';
 
 // Validation schema
 const loginSchema = z.object({
@@ -34,7 +40,7 @@ const Login: React.FC = () => {
 
       // Validate against static user data
       const user = usersData.users.find(
-        u => u.email === data.email && u.password === data.password
+        (u: any) => u.email === data.email && u.password === data.password
       );
 
       if (user) {
@@ -51,7 +57,7 @@ const Login: React.FC = () => {
         );
 
         toast.success(`Welcome back, ${user.name}!`);
-        navigate('dashboard');
+        navigate('/' + ROUTE.DASHBOARD);
       } else {
         toast.error(
           'Invalid email or password. Please check your credentials.'
@@ -65,22 +71,9 @@ const Login: React.FC = () => {
   return (
     <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-md w-full'>
-        {/* Logo/Brand Section */}
         <div className='text-center mb-8'>
           <div className='mx-auto w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg mb-4'>
-            <svg
-              className='w-8 h-8 text-white'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={2}
-                d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-              />
-            </svg>
+            <DocumentIcon className='w-8 h-8 text-white' />
           </div>
           <h2 className='text-3xl font-bold text-gray-900 mb-2'>
             Welcome Back
@@ -144,26 +137,7 @@ const Login: React.FC = () => {
             >
               {isSubmitting ? (
                 <>
-                  <svg
-                    className='animate-spin -ml-1 mr-3 h-5 w-5 text-white'
-                    xmlns='http://www.w3.org/2000/svg'
-                    fill='none'
-                    viewBox='0 0 24 24'
-                  >
-                    <circle
-                      className='opacity-25'
-                      cx='12'
-                      cy='12'
-                      r='10'
-                      stroke='currentColor'
-                      strokeWidth='4'
-                    ></circle>
-                    <path
-                      className='opacity-75'
-                      fill='currentColor'
-                      d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                    ></path>
-                  </svg>
+                  <LoadingSpinnerIcon className='-ml-1 mr-3 h-5 w-5 text-white' />
                   Signing in...
                 </>
               ) : (

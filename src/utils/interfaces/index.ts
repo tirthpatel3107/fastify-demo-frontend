@@ -2,6 +2,8 @@
 // API Response Interfaces
 // =============================================================================
 
+import { DeliveryTypeOptions } from '../enums';
+
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -76,10 +78,11 @@ export interface PrescriptionFormData {
   address: string;
   medication: string;
   dosage: string;
-  deliveryType: string;
+  deliveryType: DeliveryTypeOptions;
 }
 
 export interface Prescription {
+  prescription_id: any;
   id: string;
   patient_name: string;
   patient_dob: string;
@@ -143,7 +146,8 @@ export type MappedPrescriptionStatus =
   | 'rejected'
   | 'delivered';
 export type DeliveryType = 'pickup' | 'delivery';
-export type MappedDeliveryType = 'Pickup from Pharmacy' | 'Home Delivery';
+export type MappedDeliveryType = DeliveryTypeOptions.PICKUP_FROM_PHARMACY | DeliveryTypeOptions.HOME_DELIVERY;
+
 
 // =============================================================================
 // Utility Types

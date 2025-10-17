@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { FileText, History } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+// icons
+import { FileTextIcon, HistoryIcon } from '../../utils/SVGIcons';
 
 // components
 import PrescriptionForm from '../../components/PrescriptionForm';
@@ -10,37 +12,30 @@ import TabbedLayout from '../../components/Common/TabbedLayout';
 
 // utils
 import prescriptionService from '../../utils/apis/services/prescriptionService';
-import type { PrescriptionFormData } from '../../utils/apis/services/prescriptionService';
+import type {
+  PrescriptionFormData,
+  PrescriptionResponse,
+} from 'src/utils/interfaces';
 
-/**
- * Dashboard component - Main application interface with tabbed layout
- * Provides prescription management functionality with elegant UI
- */
 const Dashboard: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /**
-   * Handles prescription form submission
-   * @param data - Prescription form data
-   */
   const handlePrescriptionSubmit = async (data: PrescriptionFormData) => {
     setIsSubmitting(true);
     try {
-      console.log('Submitting prescription:', data);
-      const response = await prescriptionService.issuePrescription(data);
+      const response: PrescriptionResponse =
+        await prescriptionService.issuePrescription(data);
 
       if (response.success) {
-        console.log('Prescription issued successfully:', response.data);
         toast.success(
-          `Prescription issued successfully! ID: ${response.data.prescription_id}`
+          `Prescription issued successfully! ID: ${response.data?.prescription_id!}`
         );
       } else {
         throw new Error(response.message || 'Failed to issue prescription');
       }
     } catch (error: any) {
-      console.error('Failed to submit prescription:', error);
       toast.error(
-        error.message || 'Failed to submit prescription. Please try again.'
+        `${error.message}` || 'Failed to submit prescription. Please try again.'
       );
       throw error;
     } finally {
@@ -53,7 +48,7 @@ const Dashboard: React.FC = () => {
     {
       id: 'form',
       label: 'Prescription Form',
-      icon: <FileText className='w-5 h-5' />,
+      icon: <FileTextIcon className='w-5 h-5' />,
       content: (
         <PrescriptionForm
           onSubmit={handlePrescriptionSubmit}
@@ -64,7 +59,7 @@ const Dashboard: React.FC = () => {
     {
       id: 'history',
       label: 'Prescription History',
-      icon: <History className='w-5 h-5' />,
+      icon: <HistoryIcon className='w-5 h-5' />,
       content: <PrescriptionHistory />,
     },
   ];

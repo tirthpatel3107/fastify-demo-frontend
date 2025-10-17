@@ -1,24 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, ChevronDown } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+// icons
+import { UserIcon, LogOutIcon, ChevronDownIcon } from '../../utils/SVGIcons';
 
 // utils
 import { clearStorage } from '../../utils/storage';
 import { ROUTE } from '../../utils/apis/routes/clientApiRoutes';
-
-/**
- * Header Component
- *
- * Application header with user profile dropdown and navigation.
- * Features:
- * - Responsive design with mobile-friendly layout
- * - User profile dropdown with logout functionality
- * - Click-outside handling for dropdown closure
- * - Toast notifications for user feedback
- * - Clean, modern design with smooth animations
- */
-
 import type { HeaderProps } from '../../utils/interfaces';
 
 const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
@@ -35,10 +24,6 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
     department: string;
   } | null>(null);
 
-  /**
-   * Handles user logout process
-   * Clears storage, navigates to login, and shows success message
-   */
   const handleLogout = () => {
     try {
       // Navigate to login page
@@ -62,7 +47,6 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
       } catch (error) {
-        console.error('Error parsing user data from localStorage:', error);
         // Clear invalid data
         localStorage.removeItem('user');
       }
@@ -108,7 +92,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
             >
               {/* Avatar */}
               <div className='w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md'>
-                <User className='w-5 h-5 text-white' />
+                <UserIcon className='w-5 h-5 text-white' />
               </div>
 
               {/* User info */}
@@ -116,13 +100,11 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
                 <p className='text-sm font-medium text-gray-900'>
                   {user?.name || 'Loading...'}
                 </p>
-                <p className='text-xs text-gray-500'>
-                  {user?.role || 'User'}
-                </p>
+                <p className='text-xs text-gray-500'>{user?.role || 'User'}</p>
               </div>
 
               {/* Dropdown arrow */}
-              <ChevronDown
+              <ChevronDownIcon
                 className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
                   isProfileOpen ? 'rotate-180' : ''
                 }`}
@@ -136,7 +118,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
                 <div className='px-4 py-3 border-b border-gray-100'>
                   <div className='flex items-center space-x-3'>
                     <div className='w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center'>
-                      <User className='w-6 h-6 text-white' />
+                      <UserIcon className='w-6 h-6 text-white' />
                     </div>
                     <div>
                       <p className='text-sm font-medium text-gray-900'>
@@ -159,7 +141,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
                     onClick={handleLogout}
                     className='w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors duration-200'
                   >
-                    <LogOut className='w-4 h-4' />
+                    <LogOutIcon className='w-4 h-4' />
                     <span>Sign out</span>
                   </button>
                 </div>

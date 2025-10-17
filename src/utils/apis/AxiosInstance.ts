@@ -8,7 +8,7 @@ import axios, {
 // Utils
 import { LOCAL_STORAGE } from 'src/utils/constants/auth';
 import { getLocalStorage } from 'src/utils/storage';
-import { AUTH_ROUTE } from './routes/clientApiRoutes';
+import { ROUTE } from './routes/clientApiRoutes';
 import type { Error } from '../interfaces';
 
 const axiosInstance: AxiosInstance = axios.create({
@@ -36,7 +36,7 @@ axiosInstance.interceptors.response.use(
   },
   function (error: AxiosError<Error>) {
     if (error.response?.status === 401) {
-      window.location.href = `${AUTH_ROUTE.LOGIN}`;
+      window.location.href = `${ROUTE.LOGIN}`;
     }
     return Promise.reject(error);
   }

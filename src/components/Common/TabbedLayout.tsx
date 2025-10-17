@@ -3,17 +3,6 @@ import React, { useState } from 'react';
 // utils
 import type { TabbedLayoutProps } from '../../utils/interfaces';
 
-interface Tab {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  content: React.ReactNode;
-}
-
-/**
- * TabbedLayout component provides a clean tabbed interface
- * with smooth transitions and responsive design
- */
 const TabbedLayout: React.FC<TabbedLayoutProps> = ({
   tabs,
   defaultTab = tabs[0]?.id,
@@ -22,7 +11,6 @@ const TabbedLayout: React.FC<TabbedLayoutProps> = ({
 
   return (
     <div className='w-full'>
-      {/* Tab Navigation */}
       <div className='border-b border-gray-200 bg-white'>
         <nav className='flex space-x-8 px-6 lg:px-8' aria-label='Tabs'>
           {tabs.map(tab => (
@@ -54,7 +42,7 @@ const TabbedLayout: React.FC<TabbedLayoutProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className='bg-gray-50 min-h-screen'>
+      <div className='bg-gray-50'>
         <div className='px-6 lg:px-8 py-8'>
           {tabs.map(tab => (
             <div

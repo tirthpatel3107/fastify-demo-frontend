@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PRESCRIPTION_API_ROUTE } from '../../routes/serverApiRoutes';
-import type { PrescriptionFormData } from '../prescriptionService';
+import type { PrescriptionFormData } from '../../../interfaces';
+import { DeliveryTypeOptions } from '../../../enums';
 
 // Mock AxiosInstance
 const mockAxiosInstance = {
@@ -79,7 +80,7 @@ describe('PrescriptionService - Simple Tests', () => {
         address: '123 Main St, New York, NY 10001',
         medication: 'Paracetamol 500mg',
         dosage: '1 tablet twice daily',
-        deliveryType: 'Home Delivery',
+        deliveryType: DeliveryTypeOptions.HOME_DELIVERY,
       };
 
       const mockResponse = {
@@ -117,7 +118,7 @@ describe('PrescriptionService - Simple Tests', () => {
         address: '123 Main St, New York, NY 10001',
         medication: 'Paracetamol 500mg',
         dosage: '1 tablet twice daily',
-        deliveryType: 'Home Delivery',
+        deliveryType: DeliveryTypeOptions.HOME_DELIVERY,
       };
 
       const error = new Error('Validation error');

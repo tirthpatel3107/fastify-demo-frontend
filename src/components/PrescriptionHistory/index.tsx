@@ -1,49 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 // utils
 import prescriptionService from '../../utils/apis/services/prescriptionService';
 import type {
   Prescription,
-  MappedPrescriptionStatus,
-  MappedDeliveryType,
 } from '../../utils/interfaces';
+import { DeliveryTypeOptions } from '../../utils/enums';
+import { mapBackendToFrontendStatus } from '../../utils/constants/statusMapping';
+import { ClipboardIcon, ClockIcon, CheckCircleIcon, XCircleIcon } from '../../utils/SVGIcons';
 
-/**
- * PrescriptionHistory Component
- *
- * Displays a comprehensive table of prescription records with status tracking.
- * Features:
- * - Real-time status updates with visual indicators
- * - Responsive table design for all screen sizes
- * - Refresh functionality to fetch latest data
- * - Status-based color coding and icons
- * - Empty state handling
- */
-
-// Helper function to map backend status to frontend status
-const mapStatus = (status: string): MappedPrescriptionStatus => {
-  switch (status) {
-    case 'Pending':
-      return 'pending';
-    case 'Sent':
-      return 'approved';
-    case 'Delivered':
-      return 'delivered';
-    case 'Failed':
-      return 'rejected';
-    default:
-      return 'pending';
-  }
-};
+// Use centralized status mapping function
+const mapStatus = mapBackendToFrontendStatus;
 
 // Helper function to map delivery type
-const mapDeliveryType = (deliveryType: string): MappedDeliveryType | string => {
+const mapDeliveryType = (
+  deliveryType: string
+): DeliveryTypeOptions | string => {
   switch (deliveryType) {
     case 'pickup':
-      return 'Pickup from Pharmacy';
+      return DeliveryTypeOptions.PICKUP_FROM_PHARMACY;
     case 'delivery':
-      return 'Home Delivery';
+      return DeliveryTypeOptions.HOME_DELIVERY;
     default:
       return deliveryType;
   }
@@ -80,15 +58,15 @@ const PrescriptionHistory: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Clock className='w-4 h-4 text-yellow-500' />;
+        return <ClockIcon className='w-4 h-4 text-yellow-500' />;
       case 'approved':
-        return <CheckCircle className='w-4 h-4 text-green-500' />;
+        return <CheckCircleIcon className='w-4 h-4 text-green-500' />;
       case 'rejected':
-        return <XCircle className='w-4 h-4 text-red-500' />;
+        return <XCircleIcon className='w-4 h-4 text-red-500' />;
       case 'delivered':
-        return <CheckCircle className='w-4 h-4 text-blue-500' />;
+        return <CheckCircleIcon className='w-4 h-4 text-blue-500' />;
       default:
-        return <Clock className='w-4 h-4 text-gray-500' />;
+        return <ClockIcon className='w-4 h-4 text-gray-500' />;
     }
   };
 
@@ -128,19 +106,7 @@ const PrescriptionHistory: React.FC = () => {
         <div className='flex justify-between items-center'>
           <div>
             <h2 className='text-xl font-bold text-white flex items-center'>
-              <svg
-                className='w-5 h-5 mr-2'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
-                />
-              </svg>
+              <ClipboardIcon className='w-5 h-5 mr-2' />
               Prescription History
             </h2>
             <p className='text-emerald-100 text-sm mt-1'>
@@ -243,7 +209,7 @@ const PrescriptionHistory: React.FC = () => {
         {error && (
           <div className='text-center py-12'>
             <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-              <XCircle className='w-8 h-8 text-red-400' />
+              <XCircleIcon className='w-8 h-8 text-red-400' />
             </div>
             <p className='text-red-500 text-lg'>{error}</p>
             <button
@@ -258,19 +224,7 @@ const PrescriptionHistory: React.FC = () => {
         {!error && prescriptions.length === 0 && !isLoading && (
           <div className='text-center py-12'>
             <div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-              <svg
-                className='w-8 h-8 text-gray-400'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
-                />
-              </svg>
+              <ClipboardIcon className='w-8 h-8 text-gray-400' />
             </div>
             <p className='text-gray-500 text-lg'>No prescriptions found.</p>
             <p className='text-gray-400 text-sm mt-1'>

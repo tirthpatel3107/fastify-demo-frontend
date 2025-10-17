@@ -1,12 +1,9 @@
 import axiosInstance from '../AxiosInstance';
 import { PRESCRIPTION_API_ROUTE } from '../routes/serverApiRoutes';
 import type {
-  Medicine,
   MedicinesResponse,
-  Patient,
   PatientResponse,
   PrescriptionFormData,
-  Prescription,
   PrescriptionResponse,
   PrescriptionsResponse,
 } from '../../interfaces';
