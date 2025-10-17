@@ -102,21 +102,6 @@ npm run test:coverage
 npm run test:ui
 ```
 
-### Test Structure
-
-Tests are organized in the `src` directory alongside the code they test:
-
-```
-src/
-├── utils/
-│   ├── apis/
-│   │   ├── __tests__/
-│   │   │   └── tokenChecker.simple.test.ts
-│   │   └── services/
-│   │       └── __tests__/
-│   │           └── prescriptionService.simple.test.ts
-```
-
 ### Test Coverage
 
 The project includes comprehensive test coverage for:
@@ -152,25 +137,6 @@ describe('SomeModule', () => {
     expect(() => someFunction('invalid')).toThrow('Error message');
   });
 });
-```
-
-## Project Structure
-
-```
-src/
-├── components/          # Reusable UI components
-│   ├── Common/         # Common components (Header, TabbedLayout)
-│   ├── PrescriptionForm/ # Prescription form component
-│   └── PrescriptionHistory/ # Prescription history component
-├── pages/              # Page components
-│   ├── Dashboard/      # Main dashboard page
-│   └── Login/          # Login page
-├── utils/              # Utility functions and services
-│   ├── apis/           # API services and routes
-│   ├── constants/      # Application constants
-│   └── storage.ts      # Local storage utilities
-├── layouts/            # Layout components
-└── test/               # Test setup and utilities
 ```
 
 ## API Integration
