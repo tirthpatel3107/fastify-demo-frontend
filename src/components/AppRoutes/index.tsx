@@ -1,15 +1,14 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-// Layouts
+// layouts
 import PlainLayout from '../../layouts/PlainLayout';
 
 // components
 import Dashboard from '../../pages/Dashboard';
 import Login from '../../pages/Login';
 import PageNotFound from '../../pages/PageNotFound';
-// import ProtectedRoute from "./ProtectedRoute";
 
-// constants
+// utils
 import { ROUTE } from '../../utils/apis/routes/clientApiRoutes';
 
 const AppRoutes = () => {

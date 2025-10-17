@@ -1,64 +1,83 @@
-import { AxiosInstance } from '../AxiosInstance';
-
-// Prescription data types
-export interface PrescriptionFormData {
-  patientName: string;
-  dob: string;
-  address: string;
-  medication: string;
-  dosage: string;
-  deliveryType: string;
-}
-
-export interface Prescription {
-  id: string;
-  patientName: string;
-  dob: string;
-  address: string;
-  medication: string;
-  dosage: string;
-  deliveryType: string;
-  status: 'pending' | 'approved' | 'rejected' | 'delivered';
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface PrescriptionResponse {
-  success: boolean;
-  data: Prescription;
-  message: string;
-}
-
-export interface PrescriptionsResponse {
-  success: boolean;
-  data: Prescription[];
-  message: string;
-}
+import axiosInstance from '../AxiosInstance';
+import { PRESCRIPTION_API_ROUTE } from '../routes/serverApiRoutes';
+import type {
+  Medicine,
+  MedicinesResponse,
+  Patient,
+  PatientResponse,
+  PrescriptionFormData,
+  Prescription,
+  PrescriptionResponse,
+  PrescriptionsResponse,
+} from '../../interfaces';
 
 class PrescriptionService {
-  private api: AxiosInstance;
+  private api = axiosInstance;
 
-  constructor() {
-    this.api = new AxiosInstance();
-  }
-
-  // Create a new prescription
-  async createPrescription(
-    data: PrescriptionFormData
-  ): Promise<PrescriptionResponse> {
+  // Get available medicines for dropdown
+  async getMedicines(): Promise<MedicinesResponse> {
     try {
-      const response = await this.api.post('/prescriptions', data);
+      const response = await this.api.get(PRESCRIPTION_API_ROUTE.MEDICINES);
       return response.data;
     } catch (error) {
-      console.error('Error creating prescription:', error);
+      console.error('Error fetching medicines:', error);
       throw error;
     }
   }
 
-  // Get all prescriptions
-  async getPrescriptions(): Promise<PrescriptionsResponse> {
+  // Get mock patient data for testing
+  async getMockPatient(): Promise<PatientResponse> {
     try {
-      const response = await this.api.get('/prescriptions');
+      const response = await this.api.get(PRESCRIPTION_API_ROUTE.MOCK_PATIENT);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching mock patient:', error);
+      throw error;
+    }
+  }
+
+  // Issue a new prescription
+  async issuePrescription(
+    data: PrescriptionFormData
+  ): Promise<PrescriptionResponse> {
+    try {
+      const response = await this.api.post(PRESCRIPTION_API_ROUTE.ISSUE, data);
+      return response.data;
+    } catch (error) {
+      console.error('Error issuing prescription:', error);
+      throw error;
+    }
+  }
+
+  // Get prescription status by ID
+  async getPrescriptionStatus(id: string): Promise<PrescriptionResponse> {
+    try {
+      const response = await this.api.get(
+        `${PRESCRIPTION_API_ROUTE.STATUS}/${id}/status`
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching prescription status:', error);
+      throw error;
+    }
+  }
+
+  // Legacy methods for backward compatibility
+  async createPrescription(
+    data: PrescriptionFormData
+  ): Promise<PrescriptionResponse> {
+    return this.issuePrescription(data);
+  }
+
+  // Get all prescriptions
+  async getPrescriptions(
+    limit: number = 10,
+    skip: number = 0
+  ): Promise<PrescriptionsResponse> {
+    try {
+      const response = await this.api.get(PRESCRIPTION_API_ROUTE.ALL, {
+        params: { limit, skip },
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching prescriptions:', error);
@@ -66,40 +85,38 @@ class PrescriptionService {
     }
   }
 
-  // Get prescription by ID
-  async getPrescriptionById(id: string): Promise<PrescriptionResponse> {
+  // Get prescription by ID (not implemented in backend yet)
+  async getPrescriptionById(_id: string): Promise<PrescriptionResponse> {
     try {
-      const response = await this.api.get(`/prescriptions/${id}`);
-      return response.data;
+      // This endpoint doesn't exist in the backend yet
+      throw new Error('Get prescription by ID endpoint not implemented');
     } catch (error) {
       console.error('Error fetching prescription:', error);
       throw error;
     }
   }
 
-  // Update prescription status
+  // Update prescription status (not implemented in backend yet)
   async updatePrescriptionStatus(
-    id: string,
-    status: string
+    _id: string,
+    _status: string
   ): Promise<PrescriptionResponse> {
     try {
-      const response = await this.api.patch(`/prescriptions/${id}/status`, {
-        status,
-      });
-      return response.data;
+      // This endpoint doesn't exist in the backend yet
+      throw new Error('Update prescription status endpoint not implemented');
     } catch (error) {
       console.error('Error updating prescription status:', error);
       throw error;
     }
   }
 
-  // Delete prescription
+  // Delete prescription (not implemented in backend yet)
   async deletePrescription(
-    id: string
+    _id: string
   ): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await this.api.delete(`/prescriptions/${id}`);
-      return response.data;
+      // This endpoint doesn't exist in the backend yet
+      throw new Error('Delete prescription endpoint not implemented');
     } catch (error) {
       console.error('Error deleting prescription:', error);
       throw error;

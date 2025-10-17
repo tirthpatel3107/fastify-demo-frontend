@@ -9,14 +9,10 @@ import axios, {
 import { LOCAL_STORAGE } from 'src/utils/constants/auth';
 import { getLocalStorage } from 'src/utils/storage';
 import { AUTH_ROUTE } from './routes/clientApiRoutes';
-
-interface Error {
-  message: string[];
-  statusCode: number;
-}
+import type { Error } from '../interfaces';
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_APP_BACKEND_URI,
+  baseURL: `${import.meta.env.VITE_APP_BACKEND_URI + 'api/v1/'}`,
 });
 
 axiosInstance.interceptors.request.use(

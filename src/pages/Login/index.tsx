@@ -1,9 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+
+// data
+import usersData from '../../data/users.json';
 
 // Validation schema
 const loginSchema = z.object({
@@ -24,17 +27,36 @@ const Login: React.FC = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (_data: LoginFormData) => {
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      // Mock login - in real app, this would call your API
-      // console.log('Login data:', data);
-
-      // Simulate API call
+      // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Mock successful login
-      toast.success('Login successful!');
-      navigate('/dashboard');
+      // Validate against static user data
+      const user = usersData.users.find(
+        u => u.email === data.email && u.password === data.password
+      );
+
+      if (user) {
+        // Store user info in localStorage for session management
+        localStorage.setItem(
+          'user',
+          JSON.stringify({
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            department: user.department,
+          })
+        );
+
+        toast.success(`Welcome back, ${user.name}!`);
+        navigate('dashboard');
+      } else {
+        toast.error(
+          'Invalid email or password. Please check your credentials.'
+        );
+      }
     } catch {
       toast.error('Login failed. Please try again.');
     }
@@ -46,8 +68,18 @@ const Login: React.FC = () => {
         {/* Logo/Brand Section */}
         <div className='text-center mb-8'>
           <div className='mx-auto w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg mb-4'>
-            <svg className='w-8 h-8 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' />
+            <svg
+              className='w-8 h-8 text-white'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+              />
             </svg>
           </div>
           <h2 className='text-3xl font-bold text-gray-900 mb-2'>
@@ -63,7 +95,10 @@ const Login: React.FC = () => {
           <form className='space-y-6' onSubmit={handleSubmit(onSubmit)}>
             <div className='space-y-4'>
               <div>
-                <label htmlFor='email' className='block text-sm font-medium text-gray-700 mb-2'>
+                <label
+                  htmlFor='email'
+                  className='block text-sm font-medium text-gray-700 mb-2'
+                >
                   Email Address
                 </label>
                 <input
@@ -79,9 +114,12 @@ const Login: React.FC = () => {
                   </p>
                 )}
               </div>
-              
+
               <div>
-                <label htmlFor='password' className='block text-sm font-medium text-gray-700 mb-2'>
+                <label
+                  htmlFor='password'
+                  className='block text-sm font-medium text-gray-700 mb-2'
+                >
                   Password
                 </label>
                 <input
@@ -106,9 +144,25 @@ const Login: React.FC = () => {
             >
               {isSubmitting ? (
                 <>
-                  <svg className='animate-spin -ml-1 mr-3 h-5 w-5 text-white' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
-                    <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
-                    <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+                  <svg
+                    className='animate-spin -ml-1 mr-3 h-5 w-5 text-white'
+                    xmlns='http://www.w3.org/2000/svg'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                  >
+                    <circle
+                      className='opacity-25'
+                      cx='12'
+                      cy='12'
+                      r='10'
+                      stroke='currentColor'
+                      strokeWidth='4'
+                    ></circle>
+                    <path
+                      className='opacity-75'
+                      fill='currentColor'
+                      d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                    ></path>
                   </svg>
                   Signing in...
                 </>
@@ -117,13 +171,6 @@ const Login: React.FC = () => {
               )}
             </button>
           </form>
-
-          {/* Demo credentials info */}
-          <div className='mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200'>
-            <p className='text-xs text-blue-700 text-center'>
-              <strong>Demo:</strong> Use any email and password (6+ characters) to login
-            </p>
-          </div>
         </div>
       </div>
     </div>

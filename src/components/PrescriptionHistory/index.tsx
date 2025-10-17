@@ -1,79 +1,77 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Eye, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { RefreshCw, Clock, CheckCircle, XCircle } from 'lucide-react';
 
-// Mock prescription data type
-interface Prescription {
-  id: string;
-  patientName: string;
-  dob: string;
-  address: string;
-  medication: string;
-  dosage: string;
-  deliveryType: string;
-  status: 'pending' | 'approved' | 'rejected' | 'delivered';
-  createdAt: string;
-  updatedAt: string;
-}
+// utils
+import prescriptionService from '../../utils/apis/services/prescriptionService';
+import type {
+  Prescription,
+  MappedPrescriptionStatus,
+  MappedDeliveryType,
+} from '../../utils/interfaces';
 
-// Mock prescription data
-const mockPrescriptions: Prescription[] = [
-  {
-    id: '1',
-    patientName: 'John Doe',
-    dob: '1985-03-15',
-    address: '123 Main St, City, State 12345',
-    medication: 'Paracetamol 500mg',
-    dosage: '1 tablet twice daily',
-    deliveryType: 'Home Delivery',
-    status: 'approved',
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-01-15T14:20:00Z',
-  },
-  {
-    id: '2',
-    patientName: 'Jane Smith',
-    dob: '1990-07-22',
-    address: '456 Oak Ave, City, State 12345',
-    medication: 'Ibuprofen 400mg',
-    dosage: '1 tablet every 6 hours',
-    deliveryType: 'Pickup from Pharmacy',
-    status: 'pending',
-    createdAt: '2024-01-16T09:15:00Z',
-    updatedAt: '2024-01-16T09:15:00Z',
-  },
-  {
-    id: '3',
-    patientName: 'Bob Johnson',
-    dob: '1978-11-08',
-    address: '789 Pine St, City, State 12345',
-    medication: 'Amoxicillin 250mg',
-    dosage: '2 tablets three times daily',
-    deliveryType: 'Express Delivery',
-    status: 'delivered',
-    createdAt: '2024-01-14T16:45:00Z',
-    updatedAt: '2024-01-15T11:30:00Z',
-  },
-];
+/**
+ * PrescriptionHistory Component
+ *
+ * Displays a comprehensive table of prescription records with status tracking.
+ * Features:
+ * - Real-time status updates with visual indicators
+ * - Responsive table design for all screen sizes
+ * - Refresh functionality to fetch latest data
+ * - Status-based color coding and icons
+ * - Empty state handling
+ */
+
+// Helper function to map backend status to frontend status
+const mapStatus = (status: string): MappedPrescriptionStatus => {
+  switch (status) {
+    case 'Pending':
+      return 'pending';
+    case 'Sent':
+      return 'approved';
+    case 'Delivered':
+      return 'delivered';
+    case 'Failed':
+      return 'rejected';
+    default:
+      return 'pending';
+  }
+};
+
+// Helper function to map delivery type
+const mapDeliveryType = (deliveryType: string): MappedDeliveryType | string => {
+  switch (deliveryType) {
+    case 'pickup':
+      return 'Pickup from Pharmacy';
+    case 'delivery':
+      return 'Home Delivery';
+    default:
+      return deliveryType;
+  }
+};
 
 const PrescriptionHistory: React.FC = () => {
-  const [prescriptions] = useState<Prescription[]>(mockPrescriptions);
+  const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Fetches prescription data from the API
+   */
   const fetchPrescriptions = async () => {
     setIsLoading(true);
+    setError(null);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // In a real app, this would be an API call
-      // const response = await prescriptionService.getPrescriptions();
-      // setPrescriptions(response.data);
-
-      // For now, we'll just update the last updated time
-      setLastUpdated(new Date());
-    } catch {
-      // console.error('Failed to fetch prescriptions:', error);
+      const response = await prescriptionService.getPrescriptions(50, 0);
+      if (response.success && response.data) {
+        setPrescriptions(response.data);
+        setLastUpdated(new Date());
+      } else {
+        setError('Failed to fetch prescriptions');
+      }
+    } catch (error) {
+      console.error('Failed to fetch prescriptions:', error);
+      setError('Failed to fetch prescriptions. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -124,29 +122,39 @@ const PrescriptionHistory: React.FC = () => {
   }, []);
 
   return (
-    <div className='bg-white shadow-xl rounded-2xl border border-gray-100 overflow-hidden'>
+    <div className='bg-white shadow-lg rounded-xl border border-gray-200 overflow-hidden'>
       {/* Header */}
-      <div className='bg-gradient-to-r from-emerald-600 to-teal-600 px-8 py-6'>
+      <div className='bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-4'>
         <div className='flex justify-between items-center'>
           <div>
-            <h2 className='text-2xl font-bold text-white flex items-center'>
-              <svg className='w-6 h-6 mr-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' />
+            <h2 className='text-xl font-bold text-white flex items-center'>
+              <svg
+                className='w-5 h-5 mr-2'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
+                />
               </svg>
               Prescription History
             </h2>
-            <p className='text-emerald-100 mt-1'>
+            <p className='text-emerald-100 text-sm mt-1'>
               View and manage all prescription records
             </p>
           </div>
-          <div className='flex items-center space-x-4'>
-            <span className='text-sm text-emerald-100 bg-emerald-700 bg-opacity-30 px-3 py-1 rounded-full'>
+          <div className='flex items-center space-x-3'>
+            <span className='text-xs text-emerald-100 bg-emerald-700 bg-opacity-30 px-2 py-1 rounded-full'>
               Last updated: {lastUpdated.toLocaleTimeString()}
             </span>
             <button
               onClick={fetchPrescriptions}
               disabled={isLoading}
-              className='flex items-center space-x-2 px-4 py-2 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200'
+              className='flex items-center space-x-2 px-3 py-1.5 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm'
             >
               <RefreshCw
                 className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
@@ -158,8 +166,7 @@ const PrescriptionHistory: React.FC = () => {
       </div>
 
       {/* Table Content */}
-      <div className='p-8'>
-
+      <div className='p-6'>
         <div className='overflow-x-auto'>
           <table className='min-w-full divide-y divide-gray-200'>
             <thead className='bg-gradient-to-r from-gray-50 to-gray-100'>
@@ -182,53 +189,50 @@ const PrescriptionHistory: React.FC = () => {
                 <th className='px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider'>
                   Created
                 </th>
-                <th className='px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider'>
-                  Actions
-                </th>
               </tr>
             </thead>
             <tbody className='bg-white divide-y divide-gray-200'>
               {prescriptions.map(prescription => (
-                <tr key={prescription.id} className='hover:bg-gray-50 transition-colors duration-150'>
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  <div>
-                    <div className='text-sm font-medium text-gray-900'>
-                      {prescription.patientName}
+                <tr
+                  key={prescription.id}
+                  className='hover:bg-gray-50 transition-colors duration-150'
+                >
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <div>
+                      <div className='text-sm font-medium text-gray-900'>
+                        {prescription.patient_name}
+                      </div>
+                      <div className='text-sm text-gray-500'>
+                        DOB:{' '}
+                        {new Date(
+                          prescription.patient_dob
+                        ).toLocaleDateString()}
+                      </div>
                     </div>
-                    <div className='text-sm text-gray-500'>
-                      DOB: {new Date(prescription.dob).toLocaleDateString()}
-                    </div>
-                  </div>
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                  {prescription.medication}
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                  {prescription.dosage}
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                  {prescription.deliveryType}
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                      prescription.status
-                    )}`}
-                  >
-                    {getStatusIcon(prescription.status)}
-                    <span className='ml-1 capitalize'>
-                      {prescription.status}
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+                    {prescription.medication}
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+                    {prescription.dosage}
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+                    {mapDeliveryType(prescription.delivery_type)}
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                        mapStatus(prescription.status)
+                      )}`}
+                    >
+                      {getStatusIcon(mapStatus(prescription.status))}
+                      <span className='ml-1 capitalize'>
+                        {mapStatus(prescription.status)}
+                      </span>
                     </span>
-                  </span>
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                  {formatDate(prescription.createdAt)}
-                </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
-                    <button className='text-indigo-600 hover:text-indigo-900 flex items-center space-x-1 px-3 py-1 rounded-md hover:bg-indigo-50 transition-colors duration-200'>
-                      <Eye className='w-4 h-4' />
-                      <span>View</span>
-                    </button>
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+                    {formatDate(prescription.created_at)}
                   </td>
                 </tr>
               ))}
@@ -236,15 +240,42 @@ const PrescriptionHistory: React.FC = () => {
           </table>
         </div>
 
-        {prescriptions.length === 0 && (
+        {error && (
+          <div className='text-center py-12'>
+            <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+              <XCircle className='w-8 h-8 text-red-400' />
+            </div>
+            <p className='text-red-500 text-lg'>{error}</p>
+            <button
+              onClick={fetchPrescriptions}
+              className='mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200'
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {!error && prescriptions.length === 0 && !isLoading && (
           <div className='text-center py-12'>
             <div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-              <svg className='w-8 h-8 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' />
+              <svg
+                className='w-8 h-8 text-gray-400'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
+                />
               </svg>
             </div>
             <p className='text-gray-500 text-lg'>No prescriptions found.</p>
-            <p className='text-gray-400 text-sm mt-1'>Prescriptions will appear here once they are created.</p>
+            <p className='text-gray-400 text-sm mt-1'>
+              Prescriptions will appear here once they are created.
+            </p>
           </div>
         )}
       </div>

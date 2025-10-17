@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 
-// Validation schema
+// utils
+import prescriptionService from '../../utils/apis/services/prescriptionService';
+import type {
+  Medicine,
+  PrescriptionFormData,
+  PrescriptionFormProps,
+} from '../../utils/interfaces';
+
+/**
+ * PrescriptionForm Component
+ *
+ * A comprehensive form for creating new prescriptions with validation.
+ * Features:
+ * - Form validation using React Hook Form and Zod
+ * - Dynamic medicine loading from API
+ * - Real-time error handling and user feedback
+ * - Responsive design with modern UI elements
+ */
+
+// Validation schema using Zod for type-safe form validation
 const prescriptionSchema = z.object({
   patientName: z.string().min(2, 'Patient name must be at least 2 characters'),
   dob: z.string().min(1, 'Date of birth is required'),
@@ -14,34 +33,23 @@ const prescriptionSchema = z.object({
   deliveryType: z.string().min(1, 'Please select a delivery type'),
 });
 
+// Infer TypeScript type from Zod schema
 type PrescriptionFormData = z.infer<typeof prescriptionSchema>;
 
-// Mock medication options
-const medicationOptions = [
-  'Paracetamol 500mg',
-  'Ibuprofen 400mg',
-  'Amoxicillin 250mg',
-  'Metformin 500mg',
-  'Lisinopril 10mg',
-  'Atorvastatin 20mg',
-];
-
-// Mock delivery type options
+// Available delivery type options for the form
 const deliveryTypeOptions = [
   'Home Delivery',
   'Pickup from Pharmacy',
   'Express Delivery',
 ];
 
-interface PrescriptionFormProps {
-  onSubmit: (data: PrescriptionFormData) => Promise<void>;
-  isSubmitting?: boolean;
-}
-
 const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
   onSubmit,
   isSubmitting = false,
 }) => {
+  const [medicines, setMedicines] = useState<Medicine[]>([]);
+  const [loadingMedicines, setLoadingMedicines] = useState(true);
+
   const {
     register,
     handleSubmit,
@@ -50,6 +58,51 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
   } = useForm<PrescriptionFormData>({
     resolver: zodResolver(prescriptionSchema),
   });
+
+  // Load medicines from API on component mount
+  useEffect(() => {
+    const loadMedicines = async () => {
+      try {
+        setLoadingMedicines(true);
+        const response = await prescriptionService.getMedicines();
+        if (response.success) {
+          setMedicines(response.data.meds);
+        }
+      } catch (error) {
+        console.error('Failed to load medicines:', error);
+        toast.error('Failed to load medicines. Using default list.');
+        // Fallback to default medicines if API fails
+        setMedicines([
+          {
+            snomedId: '1',
+            displayName: 'Paracetamol 500mg',
+            unlicensed: false,
+            endorsements: {},
+            prescribeByBrandOnly: false,
+            type: 'vmp',
+            bnfExactMatch: null,
+            bnfMatches: null,
+            applianceTypes: [],
+          },
+          {
+            snomedId: '2',
+            displayName: 'Ibuprofen 400mg',
+            unlicensed: false,
+            endorsements: {},
+            prescribeByBrandOnly: false,
+            type: 'vmp',
+            bnfExactMatch: null,
+            bnfMatches: null,
+            applianceTypes: [],
+          },
+        ]);
+      } finally {
+        setLoadingMedicines(false);
+      }
+    };
+
+    loadMedicines();
+  }, []);
 
   const handleFormSubmit = async (data: PrescriptionFormData) => {
     try {
@@ -62,193 +115,235 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({
   };
 
   return (
-    <div className='bg-white shadow-xl rounded-2xl border border-gray-100 overflow-hidden'>
+    <div className='bg-white shadow-lg rounded-xl border border-gray-200 overflow-hidden'>
       {/* Header */}
-      <div className='bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6'>
-        <h2 className='text-2xl font-bold text-white flex items-center'>
-          <svg className='w-6 h-6 mr-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6m0 0v6m0-6h6m-6 0H6' />
+      <div className='bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4'>
+        <h2 className='text-xl font-bold text-white flex items-center'>
+          <svg
+            className='w-5 h-5 mr-2'
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M12 6v6m0 0v6m0-6h6m-6 0H6'
+            />
           </svg>
           Issue New Prescription
         </h2>
-        <p className='text-indigo-100 mt-1'>
+        <p className='text-indigo-100 text-sm mt-1'>
           Fill out the form below to create a new prescription for your patient
         </p>
       </div>
-      
+
       {/* Form Content */}
-      <div className='p-8'>
+      <div className='p-6'>
+        <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            {/* Patient Name */}
+            <div>
+              <label
+                htmlFor='patientName'
+                className='block text-sm font-medium text-gray-700 mb-2'
+              >
+                Patient Name *
+              </label>
+              <input
+                {...register('patientName')}
+                type='text'
+                id='patientName'
+                className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200'
+                placeholder='Enter patient name'
+              />
+              {errors.patientName && (
+                <p className='mt-1 text-sm text-red-600'>
+                  {errors.patientName.message}
+                </p>
+              )}
+            </div>
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          {/* Patient Name */}
+            {/* Date of Birth */}
+            <div>
+              <label
+                htmlFor='dob'
+                className='block text-sm font-medium text-gray-700 mb-2'
+              >
+                Date of Birth *
+              </label>
+              <input
+                {...register('dob')}
+                type='date'
+                id='dob'
+                className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200'
+              />
+              {errors.dob && (
+                <p className='mt-1 text-sm text-red-600'>
+                  {errors.dob.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Address */}
           <div>
             <label
-              htmlFor='patientName'
+              htmlFor='address'
               className='block text-sm font-medium text-gray-700 mb-2'
             >
-              Patient Name *
+              Address *
             </label>
-            <input
-              {...register('patientName')}
-              type='text'
-              id='patientName'
-              className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200'
-              placeholder='Enter patient name'
+            <textarea
+              {...register('address')}
+              id='address'
+              rows={3}
+              className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 resize-none'
+              placeholder='Enter patient address'
             />
-            {errors.patientName && (
+            {errors.address && (
               <p className='mt-1 text-sm text-red-600'>
-                {errors.patientName.message}
+                {errors.address.message}
               </p>
             )}
           </div>
 
-          {/* Date of Birth */}
-          <div>
-            <label
-              htmlFor='dob'
-              className='block text-sm font-medium text-gray-700 mb-2'
-            >
-              Date of Birth *
-            </label>
-            <input
-              {...register('dob')}
-              type='date'
-              id='dob'
-              className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200'
-            />
-            {errors.dob && (
-              <p className='mt-1 text-sm text-red-600'>{errors.dob.message}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Address */}
-        <div>
-          <label
-            htmlFor='address'
-            className='block text-sm font-medium text-gray-700 mb-2'
-          >
-            Address *
-          </label>
-          <textarea
-            {...register('address')}
-            id='address'
-            rows={3}
-            className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 resize-none'
-            placeholder='Enter patient address'
-          />
-          {errors.address && (
-            <p className='mt-1 text-sm text-red-600'>
-              {errors.address.message}
-            </p>
-          )}
-        </div>
-
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-          {/* Medication */}
-          <div>
-            <label
-              htmlFor='medication'
-              className='block text-sm font-medium text-gray-700 mb-2'
-            >
-              Medication *
-            </label>
-            <select
-              {...register('medication')}
-              id='medication'
-              className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200'
-            >
-              <option value=''>Select medication</option>
-              {medicationOptions.map(med => (
-                <option key={med} value={med}>
-                  {med}
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+            {/* Medication */}
+            <div>
+              <label
+                htmlFor='medication'
+                className='block text-sm font-medium text-gray-700 mb-2'
+              >
+                Medication *
+              </label>
+              <select
+                {...register('medication')}
+                id='medication'
+                disabled={loadingMedicines}
+                className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed'
+              >
+                <option value=''>
+                  {loadingMedicines
+                    ? 'Loading medicines...'
+                    : 'Select medication'}
                 </option>
-              ))}
-            </select>
-            {errors.medication && (
-              <p className='mt-1 text-sm text-red-600'>
-                {errors.medication.message}
-              </p>
-            )}
+                {medicines.map(med => (
+                  <option key={med.snomedId} value={med.displayName}>
+                    {med.displayName}
+                  </option>
+                ))}
+              </select>
+              {errors.medication && (
+                <p className='mt-1 text-sm text-red-600'>
+                  {errors.medication.message}
+                </p>
+              )}
+            </div>
+
+            {/* Dosage */}
+            <div>
+              <label
+                htmlFor='dosage'
+                className='block text-sm font-medium text-gray-700 mb-2'
+              >
+                Dosage *
+              </label>
+              <input
+                {...register('dosage')}
+                type='text'
+                id='dosage'
+                className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200'
+                placeholder='e.g., 1 tablet twice daily'
+              />
+              {errors.dosage && (
+                <p className='mt-1 text-sm text-red-600'>
+                  {errors.dosage.message}
+                </p>
+              )}
+            </div>
+
+            {/* Delivery Type */}
+            <div>
+              <label
+                htmlFor='deliveryType'
+                className='block text-sm font-medium text-gray-700 mb-2'
+              >
+                Delivery Type *
+              </label>
+              <select
+                {...register('deliveryType')}
+                id='deliveryType'
+                className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200'
+              >
+                <option value=''>Select delivery type</option>
+                {deliveryTypeOptions.map(type => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+              {errors.deliveryType && (
+                <p className='mt-1 text-sm text-red-600'>
+                  {errors.deliveryType.message}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Dosage */}
-          <div>
-            <label
-              htmlFor='dosage'
-              className='block text-sm font-medium text-gray-700 mb-2'
+          {/* Submit Button */}
+          <div className='flex justify-end pt-6 border-t border-gray-100'>
+            <button
+              type='submit'
+              disabled={isSubmitting}
+              className='flex items-center px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] shadow-lg'
             >
-              Dosage *
-            </label>
-            <input
-              {...register('dosage')}
-              type='text'
-              id='dosage'
-              className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200'
-              placeholder='e.g., 1 tablet twice daily'
-            />
-            {errors.dosage && (
-              <p className='mt-1 text-sm text-red-600'>
-                {errors.dosage.message}
-              </p>
-            )}
+              {isSubmitting ? (
+                <>
+                  <svg
+                    className='animate-spin -ml-1 mr-3 h-5 w-5 text-white'
+                    xmlns='http://www.w3.org/2000/svg'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                  >
+                    <circle
+                      className='opacity-25'
+                      cx='12'
+                      cy='12'
+                      r='10'
+                      stroke='currentColor'
+                      strokeWidth='4'
+                    ></circle>
+                    <path
+                      className='opacity-75'
+                      fill='currentColor'
+                      d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                    ></path>
+                  </svg>
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <svg
+                    className='w-5 h-5 mr-2'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M5 13l4 4L19 7'
+                    />
+                  </svg>
+                  Submit Prescription
+                </>
+              )}
+            </button>
           </div>
-
-          {/* Delivery Type */}
-          <div>
-            <label
-              htmlFor='deliveryType'
-              className='block text-sm font-medium text-gray-700 mb-2'
-            >
-              Delivery Type *
-            </label>
-            <select
-              {...register('deliveryType')}
-              id='deliveryType'
-              className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200'
-            >
-              <option value=''>Select delivery type</option>
-              {deliveryTypeOptions.map(type => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-            {errors.deliveryType && (
-              <p className='mt-1 text-sm text-red-600'>
-                {errors.deliveryType.message}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Submit Button */}
-        <div className='flex justify-end pt-6 border-t border-gray-100'>
-          <button
-            type='submit'
-            disabled={isSubmitting}
-            className='flex items-center px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] shadow-lg'
-          >
-            {isSubmitting ? (
-              <>
-                <svg className='animate-spin -ml-1 mr-3 h-5 w-5 text-white' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
-                  <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
-                  <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
-                </svg>
-                Submitting...
-              </>
-            ) : (
-              <>
-                <svg className='w-5 h-5 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' />
-                </svg>
-                Submit Prescription
-              </>
-            )}
-          </button>
-        </div>
-      </form>
+        </form>
       </div>
     </div>
   );

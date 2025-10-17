@@ -1,17 +1,15 @@
+import { Toaster } from 'react-hot-toast';
+
 // components
 import AppRoutes from './components/AppRoutes/index';
-import Login from './pages/Login';
-import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
     <>
       {/* ------ All Routes ------ */}
       <AppRoutes />
-      {/* Temporary test - uncomment to test Login component directly */}
-      {/* <Login /> */}
 
-      {/* ------ Toast, Skeleton Loader Etc. ------ */}
+      {/* ------ Toast ------ */}
       <Toaster
         position='top-right'
         toastOptions={{
