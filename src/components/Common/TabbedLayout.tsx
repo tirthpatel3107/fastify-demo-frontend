@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // utils
-import type { TabbedLayoutProps } from '../../utils/interfaces';
+import type { TabbedLayoutProps } from '../../lib/types';
 
 const TabbedLayout: React.FC<TabbedLayoutProps> = ({
   tabs,
@@ -13,7 +13,7 @@ const TabbedLayout: React.FC<TabbedLayoutProps> = ({
     <div className='w-full'>
       <div className='border-b border-gray-200 bg-white'>
         <nav className='flex space-x-8 px-6 lg:px-8' aria-label='Tabs'>
-          {tabs.map(tab => (
+          {tabs.map((tab: { id: string; label: string; icon: React.ReactNode; content: React.ReactNode }) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -44,7 +44,7 @@ const TabbedLayout: React.FC<TabbedLayoutProps> = ({
       {/* Tab Content */}
       <div className='bg-gray-50'>
         <div className='px-6 lg:px-8 py-8'>
-          {tabs.map(tab => (
+          {tabs.map((tab: { id: string; label: string; icon: React.ReactNode; content: React.ReactNode }) => (
             <div
               key={tab.id}
               className={`transition-all duration-300 ${

@@ -5,11 +5,11 @@ import { z } from 'zod';
 import toast from 'react-hot-toast';
 
 // utils
-import prescriptionService from '../../utils/apis/services/prescriptionService';
-import type { Medicine, PrescriptionFormProps } from '../../utils/interfaces';
-import { DeliveryTypeOptions } from '../../utils/enums';
-import { medicinesDummyData } from 'src/utils/constants';
-import { PlusIcon, CheckIcon } from '../../utils/SVGIcons';
+import prescriptionService from '../../lib/api/services/prescriptionService';
+import type { Medicine, PrescriptionFormProps } from '../../lib/types';
+import { DeliveryTypeOptions } from '../../lib/types';
+import { medicinesDummyData } from 'src/lib/constants';
+import { PlusIcon, CheckIcon } from '../../components/Common/SVGIcons';
 
 // Validation schema using Zod for type-safe form validation
 const prescriptionSchema = z.object({

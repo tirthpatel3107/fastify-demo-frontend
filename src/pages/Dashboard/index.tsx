@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
 // icons
-import { FileTextIcon, HistoryIcon } from '../../utils/SVGIcons';
+import { FileTextIcon, HistoryIcon } from '../../components/Common/SVGIcons';
 
 // components
 import PrescriptionForm from '../../components/PrescriptionForm';
@@ -11,11 +11,11 @@ import Header from '../../components/Common/Header';
 import TabbedLayout from '../../components/Common/TabbedLayout';
 
 // utils
-import prescriptionService from '../../utils/apis/services/prescriptionService';
+import prescriptionService from '../../lib/api/services/prescriptionService';
 import type {
   PrescriptionFormData,
   PrescriptionResponse,
-} from 'src/utils/interfaces';
+} from 'src/lib/types';
 
 const Dashboard: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);

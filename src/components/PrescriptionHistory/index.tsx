@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 
 // utils
-import prescriptionService from '../../utils/apis/services/prescriptionService';
+import prescriptionService from '../../lib/api/services/prescriptionService';
 import type {
   Prescription,
-} from '../../utils/interfaces';
-import { DeliveryTypeOptions } from '../../utils/enums';
-import { mapBackendToFrontendStatus } from '../../utils/constants/statusMapping';
-import { ClipboardIcon, ClockIcon, CheckCircleIcon, XCircleIcon } from '../../utils/SVGIcons';
+} from '../../lib/types';
+import { DeliveryTypeOptions } from '../../lib/types';
+import { mapBackendToFrontendStatus } from '../../lib/constants/statusMapping';
+import { ClipboardIcon, ClockIcon, CheckCircleIcon, XCircleIcon } from '../../components/Common/SVGIcons';
 
 // Use centralized status mapping function
 const mapStatus = mapBackendToFrontendStatus;

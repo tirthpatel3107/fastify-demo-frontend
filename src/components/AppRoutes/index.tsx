@@ -9,7 +9,7 @@ import Login from '../../pages/Login';
 import PageNotFound from '../../pages/PageNotFound';
 
 // utils
-import { ROUTE } from '../../utils/apis/routes/clientApiRoutes';
+import { ROUTE } from '../../lib/api/routes/clientApiRoutes';
 
 const AppRoutes = () => {
   return (

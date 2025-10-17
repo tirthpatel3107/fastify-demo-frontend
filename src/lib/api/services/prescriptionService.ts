@@ -6,7 +6,7 @@ import type {
   PrescriptionFormData,
   PrescriptionResponse,
   PrescriptionsResponse,
-} from '../../interfaces';
+} from '../../types';
 
 class PrescriptionService {
   private api = axiosInstance;

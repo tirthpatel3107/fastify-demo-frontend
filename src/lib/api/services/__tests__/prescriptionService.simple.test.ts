@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PRESCRIPTION_API_ROUTE } from '../../routes/serverApiRoutes';
-import type { PrescriptionFormData } from '../../../interfaces';
-import { DeliveryTypeOptions } from '../../../enums';
+import type { PrescriptionFormData } from '../../../types';
+import { DeliveryTypeOptions } from '../../../types';
 
 // Mock AxiosInstance
 const mockAxiosInstance = {

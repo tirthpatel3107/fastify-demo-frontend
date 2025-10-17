@@ -6,13 +6,13 @@ import { z } from 'zod';
 import toast from 'react-hot-toast';
 
 // data
-import { usersData } from '../../utils/data/users';
+import { usersData } from '../../lib/data/users';
 
 // icons
-import { DocumentIcon, LoadingSpinnerIcon } from '../../utils/SVGIcons';
+import { DocumentIcon, LoadingSpinnerIcon } from '../../components/Common/SVGIcons';
 
 // utils
-import { ROUTE } from 'src/utils/apis/routes/clientApiRoutes';
+import { ROUTE } from 'src/lib/api/routes/clientApiRoutes';
 
 // Validation schema
 const loginSchema = z.object({

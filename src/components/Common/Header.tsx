@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 // icons
-import { UserIcon, LogOutIcon, ChevronDownIcon } from '../../utils/SVGIcons';
+import { UserIcon, LogOutIcon, ChevronDownIcon } from './SVGIcons';
 
 // utils
-import { clearStorage } from '../../utils/storage';
-import { ROUTE } from '../../utils/apis/routes/clientApiRoutes';
-import type { HeaderProps } from '../../utils/interfaces';
+import { clearStorage } from '../../lib/helpers/storage';
+import { ROUTE } from '../../lib/api/routes/clientApiRoutes';
+import type { HeaderProps } from '../../lib/types';
 
 const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
   const navigate = useNavigate();

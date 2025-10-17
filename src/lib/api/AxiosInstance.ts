@@ -6,10 +6,10 @@ import axios, {
 } from 'axios';
 
 // Utils
-import { LOCAL_STORAGE } from 'src/utils/constants/auth';
-import { getLocalStorage } from 'src/utils/storage';
+import { LOCAL_STORAGE } from 'src/lib/constants/auth';
+import { getLocalStorage } from 'src/lib/helpers/storage';
 import { ROUTE } from './routes/clientApiRoutes';
-import type { Error } from '../interfaces';
+import type { Error } from '../types';
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: `${import.meta.env.VITE_APP_BACKEND_URI + 'api/v1/'}`,
