@@ -4,8 +4,11 @@ export const clearStorage = () => {
 };
 
 // Session storage utils
-export const getSessionStorage = (key: string) =>
-  JSON.parse(sessionStorage.getItem(key) as string);
+export const getSessionStorage = (key: string) => {
+  const item = sessionStorage.getItem(key);
+  if (!item) return null;
+  return JSON.parse(item);
+};
 
 export const setSessionStorage = (
   key: string,
@@ -18,8 +21,11 @@ export const removeSessionStorage = (key: string) =>
 export const clearSessionStorage = () => sessionStorage.clear();
 
 // Local storage utils
-export const getLocalStorage = (key: string) =>
-  JSON.parse(localStorage.getItem(key) as string);
+export const getLocalStorage = (key: string) => {
+  const item = localStorage.getItem(key);
+  if (!item) return null;
+  return JSON.parse(item);
+};
 
 export const setLocalStorage = (
   key: string,

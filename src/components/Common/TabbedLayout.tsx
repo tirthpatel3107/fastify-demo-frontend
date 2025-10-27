@@ -9,8 +9,13 @@ const TabbedLayout: React.FC<TabbedLayoutProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
 
+  // Handle empty tabs
+  if (!tabs || tabs.length === 0) {
+    return <div className='w-full' data-testid='tabbed-layout-empty' />;
+  }
+
   return (
-    <div className='w-full'>
+    <div className='w-full' data-testid='tabbed-layout'>
       <div className='border-b border-gray-200 bg-white'>
         <nav className='flex space-x-8 px-6 lg:px-8' aria-label='Tabs'>
           {tabs.map((tab: { id: string; label: string; icon: React.ReactNode; content: React.ReactNode }) => (

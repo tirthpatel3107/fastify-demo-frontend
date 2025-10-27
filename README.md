@@ -36,11 +36,13 @@ A modern, responsive React application for managing prescriptions with an elegan
 
 1. Clone the repository
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Start the development server:
+
    ```bash
    npm run dev
    ```
@@ -51,13 +53,13 @@ A modern, responsive React application for managing prescriptions with an elegan
 
 The application includes static user authentication with the following demo credentials:
 
-| Role           | Email               | Password  | Name             | Department        |
-|----------------|---------------------|------------|------------------|-------------------|
-| Administrator  | admin@clinic.com    | admin123  | Jaydeep Chandegra | General Medicine  |
-| Physician      | doctor@clinic.com   | doctor123 | Dr. Jaydeep       | Cardiology        |
-| Nurse          | nurse@clinic.com    | nurse123  | Jaydeep C         | Emergency Care    |
-| Pharmacist     | pharmacist@clinic.com | pharma123 | Mr. Jaydeep      | Pharmacy          |
-| Demo           | demo@clinic.com     | demo123   | Demo Jaydeep      | Demo Department   |
+| Role          | Email                 | Password  | Name              | Department       |
+| ------------- | --------------------- | --------- | ----------------- | ---------------- |
+| Administrator | admin@clinic.com      | admin123  | Jaydeep Chandegra | General Medicine |
+| Physician     | doctor@clinic.com     | doctor123 | Dr. Jaydeep       | Cardiology       |
+| Nurse         | nurse@clinic.com      | nurse123  | Jaydeep C         | Emergency Care   |
+| Pharmacist    | pharmacist@clinic.com | pharma123 | Mr. Jaydeep       | Pharmacy         |
+| Demo          | demo@clinic.com       | demo123   | Demo Jaydeep      | Demo Department  |
 
 ### How to Login
 
@@ -121,24 +123,6 @@ When adding new features, ensure you write corresponding tests:
 4. Mock external dependencies and API calls
 5. Test both success and error scenarios
 
-### Example Test
-
-```typescript
-import { describe, it, expect, vi } from 'vitest';
-import { someFunction } from '../someModule';
-
-describe('SomeModule', () => {
-  it('should handle success case', () => {
-    const result = someFunction('input');
-    expect(result).toBe('expected output');
-  });
-
-  it('should handle error case', () => {
-    expect(() => someFunction('invalid')).toThrow('Error message');
-  });
-});
-```
-
 ## API Integration
 
 The application integrates with a Fastify backend API for:
@@ -147,24 +131,3 @@ The application integrates with a Fastify backend API for:
 - Prescription management
 - Medicine catalog
 - Patient data management
-
-## Development Guidelines
-
-1. **Code Style**: Follow ESLint and Prettier configurations
-2. **Type Safety**: Use TypeScript for all new code
-3. **Testing**: Write tests for new features and bug fixes
-4. **Performance**: Optimize for fast loading and smooth interactions
-5. **Accessibility**: Ensure components are accessible to all users
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass
-6. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License.

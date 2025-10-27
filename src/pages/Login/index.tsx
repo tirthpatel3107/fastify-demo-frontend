@@ -85,7 +85,7 @@ const Login: React.FC = () => {
 
         {/* Login Form */}
         <div className='bg-white rounded-2xl shadow-xl p-8 border border-gray-100'>
-          <form className='space-y-6' onSubmit={handleSubmit(onSubmit)}>
+          <form className='space-y-6' onSubmit={handleSubmit(onSubmit)} noValidate>
             <div className='space-y-4'>
               <div>
                 <label
@@ -96,6 +96,8 @@ const Login: React.FC = () => {
                 </label>
                 <input
                   {...register('email')}
+                  id='email'
+                  name='email'
                   type='email'
                   autoComplete='email'
                   className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200'
@@ -117,6 +119,8 @@ const Login: React.FC = () => {
                 </label>
                 <input
                   {...register('password')}
+                  id='password'
+                  name='password'
                   type='password'
                   autoComplete='current-password'
                   className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200'
